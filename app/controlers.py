@@ -9,6 +9,7 @@ from app.dtos import (
     AuthorWriteDTO,
     BookReadDTO,
     BookWriteDTO,
+    BookUpdateDTO,
 )
 from app.models import Author, Book
 from app.repositories import (
