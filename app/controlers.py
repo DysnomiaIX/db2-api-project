@@ -59,3 +59,14 @@ class BookController(Controller):
     @post(dto=BookWriteDTO)
     async def create_book(self, data: Book, books_repo: BookRepository) -> Book:
         return books_repo.add(data)
+    @get("/{book_id:int}", return_dto=BookReadDTO)
+    async def get_book(self, book_id: int, books_repo: BookRepository) -> Book:
+        return books_repo.get(book_id)
+
+    @patch("/{book_id:int}", dto=BookUpdateDTO, return_dto=BookReadDTO)
+    async def update_book(
+        self, book_id: int, data: DTOData[Book], books_repo: BookRepository
+    ) -> Book:
+        book = books_repo.get(book_id)
+        book = data.update_instance(book)
+        return books_repo.update(book)
