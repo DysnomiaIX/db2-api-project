@@ -1,6 +1,8 @@
 from litestar import Controller, get, patch, post
 from litestar.di import Provide
 from litestar.dto import DTOData
+from litestar.exceptions import HTTPException
+from litestar.exceptions import NotFoundException
 
 from app.dtos import (
     AuthorReadDTO,
@@ -36,16 +38,23 @@ class AuthorController(Controller):
 
     @get("/{author_id:int}", return_dto=AuthorReadFullDTO)
     async def get_author(self, author_id: int, authors_repo: AuthorRepository) -> Author:
-        return authors_repo.get(author_id)
+        try:
+         return authors_repo.get(author_id)
+        except:
+         raise NotFoundException("Autor no existente")
+            
 
     @patch("/{author_id:int}", dto=AuthorUpdateDTO)
     async def update_author(
-        self, author_id: int, data: DTOData[Author], authors_repo: AuthorRepository
-    ) -> Author:
-        author = authors_repo.get(author_id)
-        author = data.update_instance(author)
-        return authors_repo.update(author)
-
+            self, author_id: int, data: DTOData[Author], authors_repo: AuthorRepository
+        ) -> Author:
+            
+            try:
+                author = authors_repo.get(author_id)
+                author = data.update_instance(author)
+                return authors_repo.update(author)
+            except:
+                raise NotFoundException("Autor no existente o no encontrado")
 
 class BookController(Controller):
     path = "/books"
@@ -60,14 +69,22 @@ class BookController(Controller):
     @post(dto=BookWriteDTO)
     async def create_book(self, data: Book, books_repo: BookRepository) -> Book:
         return books_repo.add(data)
+    
+
     @get("/{book_id:int}", return_dto=BookReadDTO)
     async def get_book(self, book_id: int, books_repo: BookRepository) -> Book:
-        return books_repo.get(book_id)
+           try:
+             return books_repo.get(book_id)
+           except:
+               raise NotFoundException("Libro no encontrado o no existente")
 
     @patch("/{book_id:int}", dto=BookUpdateDTO, return_dto=BookReadDTO)
     async def update_book(
         self, book_id: int, data: DTOData[Book], books_repo: BookRepository
     ) -> Book:
+     try:
         book = books_repo.get(book_id)
         book = data.update_instance(book)
         return books_repo.update(book)
+     except:
+         raise NotFoundException("LIbro no encontrado o no existente")
