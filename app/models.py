@@ -19,13 +19,13 @@ class Book(Base):
     year: Mapped[int]
     language: Mapped[str]
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"))
-
+    quantity: Mapped[int]
     # relationships
     author: "Mapped[Author]" = relationship(back_populates="books")
     categories: "Mapped[list[Category]]" = relationship(
         back_populates="books", secondary="books_categories"
     )
-    library = relationship("Library", back_populates="book")
+    libraries: "Mapped[list[Library]]" = relationship(back_populates="book")
 
 class Author(Base):
     __tablename__ = "authors"
@@ -64,7 +64,7 @@ class Client(Base):
     client_id: Mapped[int] = mapped_column(primary_key=True)
     client_name: Mapped[str]
     client_email: Mapped[str]
-    library = relationship("Library", back_populates="client")
+    libraries: "Mapped[list[Library]]" = relationship("Library", back_populates="client")
 
 class Library(Base):
     __tablename__ = "library"
@@ -75,6 +75,6 @@ class Library(Base):
     loan_date: Mapped[Date] = mapped_column(Date)
     return_date: Mapped[Date] = mapped_column(Date)
 
-    # relaciones principales
-    book = relationship("Book", back_populates="library")
-    client = relationship("Client", back_populates="library")
+    book: "Mapped[Book]" = relationship("Book", back_populates="libraries")
+    client: "Mapped[Client]" = relationship("Client", back_populates="libraries")
+

@@ -34,7 +34,7 @@ class ClientDTO(SQLAlchemyDTO[Client]):
     pass
 
 class ClientWriteDTO(SQLAlchemyDTO[Client]):
-    config = SQLAlchemyDTOConfig(exclude={"library"})
+    config = SQLAlchemyDTOConfig(exclude={"library","client_id"})
 
 
 class LibraryDTO(SQLAlchemyDTO[Library]):

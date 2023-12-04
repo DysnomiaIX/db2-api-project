@@ -136,13 +136,20 @@ class LibraryController(Controller):
     path= "/library"
     tags = ["library"]
     return_dto = LibraryDTO
-    dependencies = {"library_repo": Provide(provide_library_repo)}
+    dependencies = {"books_repo": Provide(provide_books_repo), "library_repo": Provide(provide_library_repo)}
+
+
+
+    @get()
+    async def rent_list(self, library_repo: LibraryRepository) -> list[Library]:
+        return library_repo.list()
 
     @post(dto=LibraryWriteDTO)
-    async def rent_book(self, book_id: int, client_id: int, rent_date: str, return_date: str, library_repo: LibraryRepository
+    async def rent_book(self, data: Library, library_repo: LibraryRepository, book_repo: BookRepository
     ) -> Library:
-            new_rent = library_repo.rent_book(book_id, client_id, rent_date, return_date)
-            return {"message": "successfully rented", "rescipt": new_rent}
+            library_repo.add(data)
+            return data
+            
 
 
     @post("/return")
@@ -155,4 +162,9 @@ class LibraryController(Controller):
         
         except:
              raise NotFoundException("no encontrado")
-
+        
+    @patch("/EditRent", return_dto=LibraryWriteDTO)
+    async def edit_rented_book(self, id_rented: int, data: Library, library_repo: LibraryRepository) -> Library:
+        library= library_repo.get(id_rented)
+        library= data.update_instance(library)
+        return library_repo.update(library)
