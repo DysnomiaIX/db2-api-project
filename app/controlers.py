@@ -12,13 +12,17 @@ from app.dtos import (
     BookReadDTO,
     BookWriteDTO,
     BookUpdateDTO,
+    ClientDTO,
+    ClientWriteDTO,
 )
-from app.models import Author, Book
+from app.models import Author, Book, Client
 from app.repositories import (
     AuthorRepository,
     BookRepository,
+    ClientRepository,
     provide_authors_repo,
     provide_books_repo,
+    provide_clients_repo,
 )
 
 
@@ -98,4 +102,25 @@ class BookController(Controller):
             raise HTTPException(status_code=404, detail="Libro no encontrado o no existente")
 
         return result_search
-        
+
+class ClientController(Controller):
+    path = "/clients"
+    tags = ["clients"]
+    return_dto = ClientDTO
+    dependencies = {"clients_repo": Provide(provide_clients_repo)}
+
+    @get()
+    async def list_clients(self, clients_repo: ClientRepository) -> list[Client]:
+        return clients_repo.list()
+
+    @post(dto=ClientWriteDTO)
+    async def create_client(self, data: Client, clients_repo: ClientRepository) -> Client:
+        return clients_repo.add(data)
+    
+    
+    @get("/{client_id:int}", return_dto=ClientDTO)
+    async def get_client(self, client_id: int, clients_repo: ClientRepository) -> Client:
+        try:
+            return clients_repo.get(client_id)
+        except:
+            raise NotFoundException("Cliente no encontrado")

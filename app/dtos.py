@@ -1,6 +1,6 @@
 from litestar.contrib.sqlalchemy.dto import SQLAlchemyDTO, SQLAlchemyDTOConfig
 
-from app.models import Author, Book
+from app.models import Author, Book, Client
 
 
 class AuthorReadDTO(SQLAlchemyDTO[Author]):
@@ -26,6 +26,12 @@ class BookReadDTO(SQLAlchemyDTO[Book]):
 class BookWriteDTO(SQLAlchemyDTO[Book]):
     config = SQLAlchemyDTOConfig(exclude={"id", "author"})
 
-    
+
 class BookUpdateDTO(SQLAlchemyDTO[Book]):
     config = SQLAlchemyDTOConfig(exclude={"id", "author"})
+
+class ClientDTO(SQLAlchemyDTO[Client]):
+    pass
+
+class ClientWriteDTO(SQLAlchemyDTO[Client]):
+    config = SQLAlchemyDTOConfig()
