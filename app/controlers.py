@@ -14,15 +14,19 @@ from app.dtos import (
     BookUpdateDTO,
     ClientDTO,
     ClientWriteDTO,
+    LibraryDTO,
+    LibraryWriteDTO,
 )
-from app.models import Author, Book, Client
+from app.models import Author, Book, Client, Library
 from app.repositories import (
     AuthorRepository,
     BookRepository,
     ClientRepository,
+    LibraryRepository,
     provide_authors_repo,
     provide_books_repo,
     provide_clients_repo,
+    provide_library_repo,
 )
 
 
@@ -112,15 +116,43 @@ class ClientController(Controller):
     @get()
     async def list_clients(self, clients_repo: ClientRepository) -> list[Client]:
         return clients_repo.list()
+    
+
 
     @post(dto=ClientWriteDTO)
     async def create_client(self, data: Client, clients_repo: ClientRepository) -> Client:
         return clients_repo.add(data)
     
-    
+
     @get("/{client_id:int}", return_dto=ClientDTO)
     async def get_client(self, client_id: int, clients_repo: ClientRepository) -> Client:
         try:
             return clients_repo.get(client_id)
         except:
             raise NotFoundException("Cliente no encontrado")
+        
+
+class LibraryController(Controller):
+    path= "/library"
+    tags = ["library"]
+    return_dto = LibraryDTO
+    dependencies = {"library_repo": Provide(provide_library_repo)}
+
+    @post(dto=LibraryWriteDTO)
+    async def rent_book(self, book_id: int, client_id: int, rent_date: str, return_date: str, library_repo: LibraryRepository
+    ) -> Library:
+            new_rent = library_repo.rent_book(book_id, client_id, rent_date, return_date)
+            return {"message": "successfully rented", "rescipt": new_rent}
+
+
+    @post("/return")
+    async def return_book(self, client_id: int, book_id:int, library_repo: LibraryRepository) -> Library:
+        rented = library_repo.get_rented(client_id)
+        
+        try:
+            library_repo.return_book(rented)
+            return {"message": "Libro retornado"}
+        
+        except:
+             raise NotFoundException("no encontrado")
+

@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, Date, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -25,7 +25,7 @@ class Book(Base):
     categories: "Mapped[list[Category]]" = relationship(
         back_populates="books", secondary="books_categories"
     )
-
+    library = relationship("Library", back_populates="book")
 
 class Author(Base):
     __tablename__ = "authors"
@@ -64,4 +64,17 @@ class Client(Base):
     client_id: Mapped[int] = mapped_column(primary_key=True)
     client_name: Mapped[str]
     client_email: Mapped[str]
-    
+    library = relationship("Library", back_populates="client")
+
+class Library(Base):
+    __tablename__ = "library"
+
+    library_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    book_id: Mapped[int] = mapped_column(Integer, ForeignKey('books.id'))
+    client_id: Mapped[int] = mapped_column(Integer, ForeignKey('clients.client_id'))
+    loan_date: Mapped[Date] = mapped_column(Date)
+    return_date: Mapped[Date] = mapped_column(Date)
+
+    # relaciones principales
+    book = relationship("Book", back_populates="library")
+    client = relationship("Client", back_populates="library")
