@@ -1,8 +1,8 @@
 from litestar import Controller, get, patch, post
 from litestar.di import Provide
 from litestar.dto import DTOData
-from litestar.exceptions import HTTPException
-from litestar.exceptions import NotFoundException
+from litestar.exceptions import HTTPException, NotFoundException
+from sqlalchemy import or_, func
 
 from app.dtos import (
     AuthorReadDTO,
@@ -88,3 +88,14 @@ class BookController(Controller):
         return books_repo.update(book)
      except:
          raise NotFoundException("LIbro no encontrado o no existente")
+    
+    @get('/search')
+    async def search_book(self, title: str, books_repo: BookRepository) -> list[Book]:
+        session = books_repo.session
+        result_search = session.query(Book).filter(func.lower(Book.title).like(f"%{title.lower()}")).all()
+
+        if not result_search:
+            raise HTTPException(status_code=404, detail="Libro no encontrado o no existente")
+
+        return result_search
+        

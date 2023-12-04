@@ -56,3 +56,4 @@ class BookCategory(Base):
 
     book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), primary_key=True)
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), primary_key=True)
+    
