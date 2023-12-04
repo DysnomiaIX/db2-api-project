@@ -140,7 +140,7 @@ class LibraryController(Controller):
 
 
 
-    @get()
+    @get("/rented")
     async def rent_list(self, library_repo: LibraryRepository) -> list[Library]:
         return library_repo.list()
 
@@ -168,3 +168,10 @@ class LibraryController(Controller):
         library= library_repo.get(id_rented)
         library= data.update_instance(library)
         return library_repo.update(library)
+    
+    @get("/{rented:int}", return_dto=LibraryDTO)
+    async def get_info_rented(self, rented: int, library_repo: LibraryRepository) -> Library:
+        try:
+            return library_repo.get(rented)
+        except:
+            raise NotFoundException("no entcontrado o no existente")

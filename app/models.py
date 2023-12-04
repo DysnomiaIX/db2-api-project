@@ -75,6 +75,7 @@ class Library(Base):
     loan_date: Mapped[Date] = mapped_column(Date)
     return_date: Mapped[Date] = mapped_column(Date)
 
+    #arreglao
     book: "Mapped[Book]" = relationship("Book", back_populates="libraries")
     client: "Mapped[Client]" = relationship("Client", back_populates="libraries")
 
